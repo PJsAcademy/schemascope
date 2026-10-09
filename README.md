@@ -5,7 +5,7 @@ SQL-first retail analytics on UK Online Retail II. SQL capstone of
 views (RFM, cohort retention, top products, daily revenue), free-form SQL Lab
 in the UI, and a 5-pattern NL→SQL mapper with None-safe fallback.
 
-**Live demo:** (fill in after `publish.sh`)
+**Live demo:** <https://schemascope-fr6rukcvakjyfv8fgeatqg.streamlit.app/>
 **Source:** <https://github.com/PJsAcademy/schemascope>
 
 ---

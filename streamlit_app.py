@@ -281,16 +281,22 @@ with tab_dash:
     c1, c2 = st.columns(2)
     with c1:
         st.subheader("Daily revenue (with cumulative)")
+        # Solid fill instead of alt.Gradient (which broke on Streamlit Cloud's
+        # Vega-Lite — gradient stops spec diverges between versions). Numeric
+        # formats use "," (digit grouping) + ".2f"; the £ is baked into the
+        # axis/tooltip titles because d3-format doesn't accept £ as a currency
+        # symbol (only $ is reserved).
         rev_line = alt.Chart(daily).mark_area(
             line={"color": BRAND_PRIMARY, "strokeWidth": 2},
-            color=alt.Gradient(gradient="linear",
-                               stops=[alt.GradientStop(color=BRAND_PRIMARY, offset=0),
-                                      alt.GradientStop(color=BRAND_INK2, offset=1)],
-                               x1=1, x2=1, y1=1, y2=0),
+            color=BRAND_PRIMARY, opacity=0.35,
         ).encode(
             x=alt.X("day:T", title=None),
             y=alt.Y("revenue:Q", title="Daily revenue (£)"),
-            tooltip=["day:T", alt.Tooltip("revenue:Q", format="£,.2f"), "orders"],
+            tooltip=[
+                alt.Tooltip("day:T", title="Day"),
+                alt.Tooltip("revenue:Q", title="Revenue (£)", format=",.2f"),
+                alt.Tooltip("orders:Q", title="Orders"),
+            ],
         ).properties(height=280)
         st.altair_chart(rev_line, use_container_width=True)
 
@@ -301,7 +307,11 @@ with tab_dash:
                 x=alt.X("revenue:Q", title="Revenue (£)"),
                 y=alt.Y("Country:N", sort="-x", title=None),
                 color=alt.Color("revenue:Q", scale=alt.Scale(scheme="blues"), legend=None),
-                tooltip=["Country", alt.Tooltip("revenue:Q", format="£,.2f"), "customers"],
+                tooltip=[
+                    alt.Tooltip("Country:N"),
+                    alt.Tooltip("revenue:Q", title="Revenue (£)", format=",.2f"),
+                    alt.Tooltip("customers:Q", title="Customers"),
+                ],
             ).properties(height=280)
         )
         st.altair_chart(country_bar, use_container_width=True)
@@ -321,7 +331,7 @@ with tab_rfm:
             size=alt.Size("monetary_clip:Q", title="Monetary (£)", scale=alt.Scale(range=[20, 400])),
             color=alt.Color("segment:N", scale=alt.Scale(scheme="category10"), title="Segment"),
             tooltip=["Customer_ID", "segment", "recency_days", "frequency",
-                     alt.Tooltip("monetary:Q", format="£,.2f")],
+                     alt.Tooltip("monetary:Q", title="Monetary (£)", format=",.2f")],
         ).properties(height=440).interactive()
     )
     st.altair_chart(scatter, use_container_width=True)
